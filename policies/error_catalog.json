@@ -1,0 +1,73 @@
+{
+  "error_codes": [
+    {
+      "error_code": "UPSTREAM_TIMEOUT_003",
+      "name": "Upstream dependency timeout",
+      "signature_phrases": [
+        "Sensor timed out",
+        "Upstream dependency timeout",
+        "ExternalTaskSensor",
+        "waiting for upstream DAG"
+      ],
+      "sop_id": "SOP_UPSTREAM_TIMEOUT_003",
+      "precedence_rank": 1,
+      "notes": "Root-cause pattern. An upstream DAG or feed did not complete in time, so the downstream job either fails outright or proceeds on stale/partial data and fails later for a different-looking reason."
+    },
+    {
+      "error_code": "EMR_OOM_002",
+      "name": "EMR executor OutOfMemoryError",
+      "signature_phrases": [
+        "OutOfMemoryError",
+        "Java heap space",
+        "GC overhead limit exceeded",
+        "Container killed by YARN for exceeding memory limits"
+      ],
+      "sop_id": "SOP_EMR_OOM_002",
+      "precedence_rank": 2,
+      "notes": "Symptom pattern. Executor ran out of memory. Can be a standalone data-volume issue, or a downstream symptom of an upstream timeout that caused the job to run on a larger-than-normal or malformed partition."
+    },
+    {
+      "error_code": "LOG_FILE_NOT_FOUND_001",
+      "name": "Input file / path not found",
+      "signature_phrases": [
+        "FileNotFoundException",
+        "No such file or directory",
+        "input path does not exist"
+      ],
+      "sop_id": "SOP_LOG_FILE_NOT_FOUND_001",
+      "precedence_rank": 3,
+      "notes": "The job's expected input path or partition was not written by the upstream process, or was written to the wrong location."
+    },
+    {
+      "error_code": "S3_ACCESS_DENIED_005",
+      "name": "S3 access denied",
+      "signature_phrases": [
+        "AccessDenied",
+        "403 Forbidden",
+        "S3 Access Denied",
+        "AmazonS3Exception"
+      ],
+      "sop_id": "SOP_S3_ACCESS_DENIED_005",
+      "precedence_rank": 4,
+      "notes": "The pipeline's own EMR role could not read or write the S3 object it needed. Distinct from a tooling-level access-denied on the agent's own log-fetch call -- this is the DAG's own read/write failing, present inside the log text."
+    },
+    {
+      "error_code": "DAG_TASK_FAIL_004",
+      "name": "Generic DAG task failure",
+      "signature_phrases": [
+        "Task failed with exit code",
+        "DAG run failed",
+        "task instance failed"
+      ],
+      "sop_id": "SOP_DAG_TASK_FAIL_004",
+      "precedence_rank": 5,
+      "notes": "Catch-all pattern with no more specific signature present. Lowest precedence -- if a more specific error code also matches, prefer the more specific one."
+    }
+  ],
+  "precedence_rules": [
+    "When more than one error_code's signature phrases are found in the same log, the error_code with the LOWER precedence_rank number wins (rank 1 = root cause, highest priority; rank 5 = generic catch-all, lowest priority).",
+    "Known co-occurrence: UPSTREAM_TIMEOUT_003 (rank 1) commonly appears earlier in the log and causes a downstream EMR_OOM_002 (rank 2) as the job proceeds on stale or oversized partitions. When both signatures appear in the same log, classify as UPSTREAM_TIMEOUT_003, not EMR_OOM_002.",
+    "If the only phrases present are generic (DAG_TASK_FAIL_004) with no more specific signature, and no other error_code's phrases are present, DAG_TASK_FAIL_004 is the match, but confidence should be scored lower to reflect the lack of a specific root cause.",
+    "If two error codes of similar specificity (not a known root-cause/symptom pair) appear with comparable strength and no precedence rule disambiguates them, do not force a match -- score confidence below the 0.95 floor and let the escalation rule apply."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "incident_number": "INC0000000",
+  "resolution_summary": "Detected <ERROR_CODE> (<error name>) in the EMR log for <dag_name>, run <failure_timestamp>. Applied <SOP_ID>: <one-line summary of steps executed>. Recovery confirmed: rerun/EMR step completed successfully.",
+  "error_code_identified": "EMR_OOM_002",
+  "sop_applied": "SOP_EMR_OOM_002",
+  "confidence": 0.96,
+  "steps_executed_by": "engineer_approval",
+  "recovery_confirmed": true,
+  "closed_by": "agent (post human approval)",
+  "closed_at": "2026-07-30T02:26:00Z",
+  "status": "Resolved"
+}

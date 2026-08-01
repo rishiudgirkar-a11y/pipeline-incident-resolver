@@ -1,0 +1,167 @@
+[
+  {
+    "incident_number": "INC0001234",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-07-30T02:14:00Z",
+    "created_at": "2026-07-30T02:16:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest EMR step failed overnight",
+    "simulated_recovery": "success"
+  },
+  {
+    "incident_number": "INC0002345",
+    "dag_name": "hourly_events_curate",
+    "pipeline": "Hourly Events Curation (EMR)",
+    "failure_timestamp": "2026-07-30T09:00:00Z",
+    "created_at": "2026-07-30T09:02:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Hourly events curation job failed, log not returned",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0003456",
+    "dag_name": "weekly_rollup",
+    "pipeline": "Weekly Rollup (EMR)",
+    "failure_timestamp": "2026-07-27T06:00:00Z",
+    "created_at": "2026-07-27T06:05:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Weekly rollup failure, fetched log looks off-run",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0004567",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-07-29T02:11:00Z",
+    "created_at": "2026-07-29T02:13:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest failed with an ambiguous log signature",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0005678",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-07-28T03:20:00Z",
+    "created_at": "2026-07-28T03:22:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest S3 read failing",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0006789",
+    "dag_name": "pii_masking_job",
+    "pipeline": "PII Masking Job (EMR)",
+    "failure_timestamp": "2026-07-31T04:45:00Z",
+    "created_at": "2026-07-31T04:47:00Z",
+    "severity": "SEV-1",
+    "status": "Open",
+    "short_description": "PII masking job failed, possible data exposure risk, log unreadable",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0007890",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-07-26T02:15:00Z",
+    "created_at": "2026-07-26T02:18:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest failed, log shows more than one error signature",
+    "simulated_recovery": "success"
+  },
+  {
+    "incident_number": "INC0008901",
+    "dag_name": "inventory_sync_daily",
+    "pipeline": "Inventory Sync Daily (EMR)",
+    "failure_timestamp": "2026-07-20T01:05:00Z",
+    "created_at": "2026-07-20T01:07:00Z",
+    "severity": "SEV-3",
+    "status": "Resolved",
+    "short_description": "Inventory sync failed on missing input path",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0009012",
+    "dag_name": "marketing_attribution_etl",
+    "pipeline": "Marketing Attribution ETL (EMR)",
+    "failure_timestamp": "2026-07-18T05:30:00Z",
+    "created_at": "2026-07-18T05:32:00Z",
+    "severity": "SEV-2",
+    "status": "Escalated",
+    "short_description": "Marketing attribution ETL task failure, rerun did not recover",
+    "simulated_recovery": "fail"
+  },
+  {
+    "incident_number": "INC0010123",
+    "dag_name": "clickstream_dedup",
+    "pipeline": "Clickstream Dedup (EMR)",
+    "failure_timestamp": "2026-07-15T11:40:00Z",
+    "created_at": "2026-07-15T11:42:00Z",
+    "severity": "SEV-3",
+    "status": "Resolved",
+    "short_description": "Clickstream dedup executor ran out of memory",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0011234",
+    "dag_name": "fraud_scoring_batch",
+    "pipeline": "Fraud Scoring Batch (EMR)",
+    "failure_timestamp": "2026-07-29T14:10:00Z",
+    "created_at": "2026-07-29T14:12:00Z",
+    "severity": "SEV-2",
+    "status": "Open",
+    "short_description": "Fraud scoring batch waiting on upstream dependency",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0012345",
+    "dag_name": "customer_360_merge",
+    "pipeline": "Customer 360 Merge (EMR)",
+    "failure_timestamp": "2026-07-10T08:00:00Z",
+    "created_at": "2026-07-10T08:02:00Z",
+    "severity": "SEV-3",
+    "status": "Resolved",
+    "short_description": "Customer 360 merge blocked by S3 permissions",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0013456",
+    "dag_name": "log_archival_job",
+    "pipeline": "Log Archival Job (EMR)",
+    "failure_timestamp": "2026-07-31T00:20:00Z",
+    "created_at": "2026-07-31T00:22:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Log archival job could not find its input path",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0014567",
+    "dag_name": "currency_rates_sync",
+    "pipeline": "Currency Rates Sync (EMR)",
+    "failure_timestamp": "2026-07-12T03:00:00Z",
+    "created_at": "2026-07-12T03:02:00Z",
+    "severity": "SEV-3",
+    "status": "Resolved",
+    "short_description": "Currency rates sync task failed generically",
+    "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0015678",
+    "dag_name": "warehouse_load_nightly",
+    "pipeline": "Warehouse Load Nightly (EMR)",
+    "failure_timestamp": "2026-07-31T02:00:00Z",
+    "created_at": "2026-07-31T02:03:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Warehouse load nightly EMR step ran out of memory",
+    "simulated_recovery": null
+  }
+]
