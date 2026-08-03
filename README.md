@@ -3,7 +3,7 @@
 An agent that triages AWS data pipeline failures the way an on-call engineer would — reads the incident and the log, matches it against a known error catalog and its runbooks, and recommends a fix. It never executes anything on its own: every recommendation goes through a human Approve / Edit / Escalate gate, and the agent refuses and escalates outright when it isn't confident, when its own tools can't get it evidence, or when the log itself looks tampered with.
 
 **Live demo:** https://rishiudgirkar-a11y.github.io/pipeline-incident-resolver/
-**Built as part of an Agentic AI capstone** (Discovery → Design → Develop → Deploy).
+**Built as part of an Agentic AI Demo* (Discovery → Design → Develop → Deploy).
 
 > All data in this repo — incidents, logs, error codes, SOPs — is synthetic. No real pipeline names, credentials, or company data appear anywhere.
 
