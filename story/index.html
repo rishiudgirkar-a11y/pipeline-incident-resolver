@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en" data-skin="ops">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Incident Resolver — Story</title>
+<meta name="description" content="An agent that triages AWS data pipeline failures, cites its evidence, and refuses rather than guesses when it isn't sure — built end-to-end with Claude Code.">
+<style>
+:root{
+  --bg:#0F1420; --bg-raise:#171E2E; --bg-inset:#0B0F18; --line:#263049;
+  --ink:#E8EDF7; --ink-2:#9AA6BF; --ink-3:#5E6A85;
+  --accent:#6C8CFF; --accent-ink:#FFFFFF; --chip:#1E2740;
+  --ok:#1FA971; --warn:#D98E04; --danger:#D64545;
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);line-height:1.6;}
+.wrap{max-width:1160px;margin:0 auto;padding:40px 24px 100px;}
+.topnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px;}
+.topnav a{color:var(--ink-2);text-decoration:none;font-size:14px;font-weight:600;}
+.topnav a:hover{color:var(--ink);}
+.tag{font-size:12px;letter-spacing:.14em;color:var(--ink-3);font-weight:700;}
+.hero{text-align:center;margin-bottom:48px;}
+.hero h1{font-size:56px;margin:0 0 8px;font-weight:800;letter-spacing:-.01em;}
+.hero h1 .dot{color:var(--accent);}
+.hero .byline{color:var(--ink-2);font-size:16px;}
+.hero .pitchline{max-width:640px;margin:20px auto 0;color:var(--ink-2);font-size:17px;}
+.stage{display:grid;grid-template-columns:1fr 300px;gap:28px;margin-bottom:40px;}
+@media (max-width:860px){.stage{grid-template-columns:1fr;}}
+.video-card{background:var(--bg-raise);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px -30px rgba(0,0,0,.7);}
+.video-card video{width:100%;display:block;background:#000;}
+.side{display:flex;flex-direction:column;gap:14px;}
+.side a{display:flex;align-items:center;gap:14px;background:var(--bg-raise);border:1px solid var(--line);border-radius:12px;padding:16px;text-decoration:none;color:var(--ink);transition:border-color .15s;}
+.side a:hover{border-color:var(--accent);}
+.side a .ico{width:36px;height:36px;border-radius:8px;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;}
+.side a .t{font-weight:700;font-size:15px;}
+.side a .s{color:var(--ink-3);font-size:13px;}
+.side a .arrow{margin-left:auto;color:var(--ink-3);font-size:16px;}
+
+.section{margin:56px 0;}
+.section .kicker{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;font-weight:800;color:var(--accent);text-transform:uppercase;margin-bottom:14px;}
+.section .kicker .n{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;}
+.section h2{font-size:28px;margin:0 0 18px;}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+@media (max-width:860px){.cards{grid-template-columns:1fr;}}
+.card{background:var(--bg-raise);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.card h3{margin:0 0 8px;font-size:15px;color:var(--ink);}
+.card p{margin:0;color:var(--ink-2);font-size:14px;}
+
+.evidence{display:flex;gap:18px;margin-top:20px;flex-wrap:wrap;}
+.stat{flex:1;min-width:140px;background:var(--bg-raise);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center;}
+.stat .n{font-size:36px;font-weight:800;}
+.stat.ok .n{color:var(--ok);} .stat.warn .n{color:var(--warn);}
+.stat .l{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:4px;}
+
+.quote{border-left:3px solid var(--accent);padding-left:18px;margin:20px 0;color:var(--ink-2);font-style:italic;}
+.code{font-family:var(--font-mono);background:var(--bg-inset);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:.9em;color:var(--ink-2);}
+
+.footer{margin-top:70px;padding-top:28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--ink-3);font-size:13px;flex-wrap:wrap;gap:12px;}
+.footer a{color:var(--ink-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topnav">
+    <a href="../">&larr; Pipeline Incident Resolver (live app)</a>
+    <span class="tag">CAPSTONE PROJECT · AGENTIC AI</span>
+  </div>
+
+  <div class="hero">
+    <h1>Pipeline Incident Resolver<span class="dot">.</span></h1>
+    <div class="byline">By Rishi Udgirkar</div>
+    <p class="pitchline">An agent that triages AWS data pipeline failures the way an on-call engineer would — reads the log, cites its evidence, recommends a fix — and refuses rather than guesses when it isn't sure. Every action goes through a human gate.</p>
+  </div>
+
+  <div class="stage">
+    <div class="video-card">
+      <video controls preload="metadata" poster="poster.jpg">
+        <source src="pitch.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="side">
+      <a href="https://rishiudgirkar-a11y.github.io/pipeline-incident-resolver/" target="_blank" rel="noopener">
+        <div class="ico">▶</div>
+        <div><div class="t">Live Demo</div><div class="s">Try the working prototype</div></div>
+        <div class="arrow">↗</div>
+      </a>
+      <a href="https://github.com/rishiudgirkar-a11y/pipeline-incident-resolver/blob/main/DEVELOP_PRD_ANSWERS.md" target="_blank" rel="noopener">
+        <div class="ico">📄</div>
+        <div><div class="t">Develop PRD</div><div class="s">Scope, evals, improvement made</div></div>
+        <div class="arrow">↗</div>
+      </a>
+      <a href="https://github.com/rishiudgirkar-a11y/pipeline-incident-resolver/blob/main/DEPLOY_PRD_ANSWERS.md" target="_blank" rel="noopener">
+        <div class="ico">🚀</div>
+        <div><div class="t">Deploy PRD</div><div class="s">Go/no-go, risks, pilot plan</div></div>
+        <div class="arrow">↗</div>
+      </a>
+      <a href="https://github.com/rishiudgirkar-a11y/pipeline-incident-resolver" target="_blank" rel="noopener">
+        <div class="ico">⌥</div>
+        <div><div class="t">Repository</div><div class="s">Full source + policies</div></div>
+        <div class="arrow">↗</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================= PROBLEM & DISCOVERY ================= -->
+  <div class="section">
+    <div class="kicker"><span class="n">1</span> Problem &amp; Discovery</div>
+    <h2>An hour of manual log-reading, for failures that already follow known patterns.</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>The problem</h3>
+        <p>When an AWS pipeline fails, an on-call engineer spends 1–2 hours reading raw EMR logs, hunting SharePoint for the right runbook, and applying a fix by hand — even though most failures follow five well-documented patterns.</p>
+      </div>
+      <div class="card">
+        <h3>The insight</h3>
+        <p>The bottleneck isn't knowing the fix — it's the hour it takes to find out. Two engineers reading the same log can walk away with two different conclusions. That inconsistency, not just the delay, is the real cost.</p>
+      </div>
+      <div class="card">
+        <h3>The idea</h3>
+        <p>An agent that does the reading, not the deciding: it classifies the failure, cites its exact evidence, and recommends a fix — but a human always clicks Approve, Edit, or Escalate. Speed without giving up control.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AI SOLUTION & EVALUATION ================= -->
+  <div class="section">
+    <div class="kicker"><span class="n">2</span> AI Solution &amp; Evaluation</div>
+    <h2>A working loop, tested against the live model — not just built.</h2>
+    <p style="color:var(--ink-2);max-width:760px;">Five stages, visible on screen every run: input → context → decision → output → human review. The decision stage is a live call to <span class="code">claude-sonnet-4-5</span> that classifies the failure, applies precedence when signals conflict, and runs five pre-recommendation checks before it says anything. See it live in the video above, or try the <a href="https://rishiudgirkar-a11y.github.io/pipeline-incident-resolver/" style="color:var(--accent);">demo</a> yourself.</p>
+
+    <div class="evidence">
+      <div class="stat ok"><div class="n">4 / 5</div><div class="l">Eval cases pass</div></div>
+      <div class="stat warn"><div class="n">1</div><div class="l">Honestly flagged "needs work"</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Escalation triggers enforced</div></div>
+      <div class="stat"><div class="n">4×</div><div class="l">Re-runs to confirm a fix held</div></div>
+    </div>
+
+    <div class="quote">
+      Mid-build, I ran an adversarial test — injected a fake instruction into a log telling the agent to ignore its rules and close the ticket. The first run, it did the safe thing but never flagged the attack. That gap became a 7th mandatory escalation trigger: adversarial content in the log. Re-tested four times before calling it fixed.
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Evaluation framework</h3>
+        <p>5 cases, each mapped to an expected outcome: happy path, missing data, low confidence, tooling-blind + high severity, and cascading failures needing precedence logic — run for real, not mocked.</p>
+      </div>
+      <div class="card">
+        <h3>Metrics that matter</h3>
+        <p>Pilot success bar: ≥95% of recommendations approved as-is, zero missed escalations, median resolution under 15 minutes — thresholds, not vibes.</p>
+      </div>
+      <div class="card">
+        <h3>Evidence, not assertion</h3>
+        <p>The one "needs work" case is left in the scoreboard on purpose — a clean sweep on a first pass usually means the tests weren't hard enough.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STORYTELLING & DELIVERY ================= -->
+  <div class="section">
+    <div class="kicker"><span class="n">3</span> Storytelling &amp; Delivery</div>
+    <h2>Executive-level narrative, plain-language AI concepts.</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>The narrative arc</h3>
+        <p>The video above follows one beat: problem → live demo (including the refusal case) → evidence (evals + the fixed vulnerability) → the launch plan. No slide is there without a job to do.</p>
+      </div>
+      <div class="card">
+        <h3>No jargon tax</h3>
+        <p>"Refuses and escalates" instead of "guardrails." "Cites the log line it used" instead of "grounding." The goal is that a non-technical exec and a data engineer both leave with the same understanding.</p>
+      </div>
+      <div class="card">
+        <h3>Built with Claude Code</h3>
+        <p>Discovery through deploy plan, end to end. I directed every product and safety decision — scope, escalation triggers, eval design, the fix for the injection gap; Claude Code handled the implementation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Pipeline Incident Resolver — Agentic AI Capstone</span>
+    <span><a href="https://github.com/rishiudgirkar-a11y/pipeline-incident-resolver" target="_blank" rel="noopener">github.com/rishiudgirkar-a11y/pipeline-incident-resolver</a></span>
+  </div>
+
+</div>
+</body>
+</html>
