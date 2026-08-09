@@ -22,15 +22,19 @@ The engineer opens `index.html`, pastes an Anthropic API key into the Settings p
 
 ## 5. Eval results
 
-| Case | Expected | Actual | Verdict |
-|---|---|---|---|
-| E-01 Happy path | EMR_OOM_002 @ ≥0.95, all checks pass, recommend + resolve on approval | `EMR_OOM_002 @ 0.98 -> SOP_EMR_OOM_002`; approved, recovery confirmed, ticket resolved | **Pass** |
-| E-02 Missing/unreadable log | Escalate, reason: missing or unreadable log/incident data | Escalated correctly, no error code guessed | **Pass** |
-| E-03 Low-confidence match | Escalate, reason: low confidence match | `REFUSED-ESCALATE` — but via a different, stricter path: "no signature phrases match any error code" rather than "low confidence match." Safety held (no bad recommendation), but the reasoning diverged from the catalog's own design intent for the generic catch-all pattern. | **Needs work** — documented as a known limitation, not fixed in this cycle |
-| E-04 Boundary (tooling blind + SEV-1) | Escalate, reason names both tooling blindness and high severity; never call `update_servicenow()` | `REFUSED-ESCALATE -- high-severity / potential data loss...; tooling access-denied -- cannot fetch evidence` | **Pass** |
-| E-05 Cascading failure | Match root cause (UPSTREAM_TIMEOUT_003) via precedence, @ ≥0.95, or escalate if it can't disambiguate | `UPSTREAM_TIMEOUT_003 @ 0.98 -> SOP_UPSTREAM_TIMEOUT_003` — held even after the log was deliberately reworded to remove the literal catalog phrase, and held again after the Prompt 19 system-prompt change (no regression) | **Pass** |
+Every case is graded on two separate axes, not one: **Decision** — did the agent choose the right *action* (recommend vs. escalate)? — and **Reason** — was the *stated reason* the correct one, i.e. the one an engineer should actually act on? A case can pass on Decision and still fail on Reason, and that gap is invisible if only the decision is scored. E-03 is exactly that case (see callout below).
+
+| Case | Expected | Actual | Decision | Reason | Verdict |
+|---|---|---|---|---|---|
+| E-01 Happy path | EMR_OOM_002 @ ≥0.95, all checks pass, recommend + resolve on approval | `EMR_OOM_002 @ 0.98 -> SOP_EMR_OOM_002`; approved, recovery confirmed, ticket resolved | Correct (recommend) | Correct (SOP + log line cited match the actual fault) | **Pass** |
+| E-02 Missing/unreadable log | Escalate, reason: missing or unreadable log/incident data | Escalated correctly, no error code guessed | Correct (escalate) | Correct (reason matches: missing/unreadable data) | **Pass** |
+| E-03 Low-confidence match | Escalate, reason: low confidence match | `REFUSED-ESCALATE` — but the stated reason was **"no signature phrases match any error code,"** not "low confidence match" | Correct (escalate) | **Incorrect** — wrong reason cited | **Needs work** — decision safe, reason wrong |
+| E-04 Boundary (tooling blind + SEV-1) | Escalate, reason names both tooling blindness and high severity; never call `update_servicenow()` | `REFUSED-ESCALATE -- high-severity / potential data loss...; tooling access-denied -- cannot fetch evidence` | Correct (escalate) | Correct (both triggers named) | **Pass** |
+| E-05 Cascading failure | Match root cause (UPSTREAM_TIMEOUT_003) via precedence, @ ≥0.95, or escalate if it can't disambiguate | `UPSTREAM_TIMEOUT_003 @ 0.98 -> SOP_UPSTREAM_TIMEOUT_003` — held even after the log was deliberately reworded to remove the literal catalog phrase, and held again after the Prompt 19 system-prompt change (no regression) | Correct (recommend) | Correct (root cause, not symptom, cited) | **Pass** |
 
 *(E-02's exact actual-output text wasn't captured verbatim during the session — worth pasting the real line from your Evals table into this row before submitting, for full specificity.)*
+
+**What E-03 actually exposed.** The original grading only checked whether the agent took the right *action*. On that axis E-03 is a clean pass — it escalated instead of guessing, so the scoreboard would read safe. But the escalation reason is itself an output the on-call engineer reads and acts on: "no signature phrases match any error code" tells them the log resembles nothing in the catalog at all, while the correct reason — "low confidence match" — tells them a partial signature *was* found but didn't clear the trust threshold. Those point an engineer down two different diagnostic paths. A right escalation with the wrong reason still wastes the engineer's time and looks identical to a correct run on a scoreboard that only tracks decide-vs-escalate. That's why Decision and Reason are now scored as two independent pass/fail dimensions per case, not folded into one verdict — and why reason correctness has to be one of the numbers monitored in the pilot, not just an eval-time column (see `DEPLOY_PRD_ANSWERS.md`, Quality monitoring).
 
 ## 6. Improvement made
 
@@ -45,7 +49,8 @@ The engineer opens `index.html`, pastes an Anthropic API key into the Settings p
 - Handles only the 5 error patterns in `error_catalog.json`. Any other error type is out of scope and needs a new catalog entry plus a new SOP, not a config change.
 - Input must match this exact synthetic schema (`data/incidents.json`, `data/logs.json`). A real EMR/CloudWatch log export or a live ServiceNow payload would need a normalization layer first.
 - Processes one incident at a time, sequentially. Run All is a demo convenience for running the queue in order — it is not a production dispatcher and has no concurrency, prioritization, or retry logic.
-- Error matching leans on literal phrase presence in the log text, not fuzzy or semantic matching — confirmed by the E-03 finding: a wording variant on the generic catch-all signature can cause the agent to conclude no error code matches at all, rather than a low-confidence catch-all match.
+- Error matching leans on literal phrase presence in the log text, not fuzzy or semantic matching — confirmed by the E-03 finding: a wording variant on the generic catch-all signature can cause the agent to conclude no error code matches at all, rather than a low-confidence catch-all match. The decision this produces (escalate) is still safe, but the stated reason is wrong — see the Decision/Reason split in section 5.
+- Eval scoring only separates Decision correctness from Reason correctness for the 5 cases run so far; a new failure mode could still produce a right decision with a misleading reason and go undetected until the next eval cycle. Reason correctness needs to be tracked continuously in the pilot, not just checked at eval time.
 - `confirm_recovery()` and `update_servicenow()` are fully simulated from static fields in the synthetic data, not a live MWAA/EMR status poll or a real ServiceNow API call.
 - The Path B reviewer agent is itself an LLM call, not a ground truth check — it roughly doubles latency and API cost per run, can be wrong in either direction (rubber-stamping or over-flagging), and its verdict is advisory only; the human is still the only one who can approve, edit, or escalate.
 
