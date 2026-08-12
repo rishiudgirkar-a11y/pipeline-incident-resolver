@@ -34,6 +34,8 @@ Open the [live demo](https://rishiudgirkar-a11y.github.io/pipeline-incident-reso
 | Low confidence | Escalates when no signature clears the confidence floor |
 | **Boundary** | SEV-1 incident whose log the agent's own tool can't fetch — refuses and escalates on screen, in red |
 | Cascading failure | Two co-occurring error signatures; agent applies catalog precedence to the root cause, not the obvious symptom |
+| DAG name mismatch | Log returned is for the wrong DAG entirely; agent escalates on the correlation check instead of trusting a clean-looking signature |
+| Failure-time correlation mismatch | Log is a stale one from an earlier run of the same DAG; agent escalates on the timestamp mismatch rather than resolving the wrong run |
 
 Or run it locally — it's a single static file:
 
@@ -52,7 +54,7 @@ index.html                          the entire product — one file
 data/
   incidents.json                    15 synthetic ServiceNow-style incidents
   logs.json                         matching EMR/Airflow log snippets
-  eval_cases.csv                    the 5 eval cases run against the live agent
+  eval_cases.csv                    the 7 eval cases run against the live agent
 policies/
   error_catalog.json                5 known error codes + precedence rules
   escalation_policy.md              all 7 escalation triggers + pre/post checks
@@ -69,7 +71,7 @@ DEPLOY_PRD_ANSWERS.md               launch phase: go/no-go, risks, pilot plan, m
 
 ## Evals
 
-5 cases run for real against the live model — 4 pass, 1 recorded honestly as "needs work" rather than smoothed over:
+7 cases run for real against the live model — 6 pass, 1 recorded honestly as "needs work" rather than smoothed over. Two of the seven (DAG mismatch, failure-time mismatch) were added after review flagged that the original five never exercised the DAG/time correlation escalation trigger at all:
 
 | Case | Expected | Result |
 |---|---|---|
@@ -78,6 +80,8 @@ DEPLOY_PRD_ANSWERS.md               launch phase: go/no-go, risks, pilot plan, m
 | Low-confidence match | Escalate on confidence floor | **Needs work** — escalates correctly but via a stricter path than the catalog's intended generic-match reasoning; safety held, reasoning diverged. Documented, not silently fixed. |
 | Boundary (tooling-blind + SEV-1) | Escalate, name both reasons, never close the ticket | **Pass** |
 | Cascading failure | Match root cause via precedence | **Pass** — held even after the log was reworded to remove the literal catalog phrase |
+| DAG name mismatch | Escalate on correlation check, ignore how clean the log looks | **Pass** |
+| Failure-time correlation mismatch | Escalate on correlation check, ignore how clean the log looks | **Pass** |
 
 Full detail, including the adversarial prompt-injection test that was found and fixed mid-build, in [`DEVELOP_PRD_ANSWERS.md`](DEVELOP_PRD_ANSWERS.md).
 
