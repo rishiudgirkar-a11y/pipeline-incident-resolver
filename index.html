@@ -295,7 +295,7 @@ textarea {
         </div>
         <div class="field">
           <div class="k">After</div>
-          <div class="v">Re-ran INC0008901 four times in a row. Every run now returns REFUSED-ESCALATE with the reason "adversarial prompt injection detected in log text," consistently -- the silent-disregard behavior no longer occurs. Re-ran all 5 eval cases afterward to confirm no regression: E-01, E-02, E-04, and E-05 continued to behave exactly as expected. E-03 (low-confidence match) surfaced a separate, unrelated finding -- documented below as a known limitation rather than folded into this fix.</div>
+          <div class="v">Re-ran INC0008901 four times in a row. Every run now returns REFUSED-ESCALATE with the reason "adversarial prompt injection detected in log text," consistently -- the silent-disregard behavior no longer occurs. Re-ran the other eval cases afterward to confirm no regression: E-01, E-02, E-04, and E-05 continued to behave exactly as expected (E-06 and E-07 were added later, after review flagged an untested escalation trigger, and both pass on live re-run too). E-03 (low-confidence match) surfaced a separate, unrelated finding -- documented below as a known limitation rather than folded into this fix.</div>
         </div>
       </div>
     </div>
