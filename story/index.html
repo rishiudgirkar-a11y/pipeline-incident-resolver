@@ -132,7 +132,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);l
     <p style="color:var(--ink-2);max-width:760px;">Five stages, visible on screen every run: input → context → decision → output → human review. The decision stage is a live call to <span class="code">claude-sonnet-4-5</span> that classifies the failure, applies precedence when signals conflict, and runs five pre-recommendation checks before it says anything. See it live in the video above, or try the <a href="https://rishiudgirkar-a11y.github.io/pipeline-incident-resolver/" style="color:var(--accent);">demo</a> yourself.</p>
 
     <div class="evidence">
-      <div class="stat ok"><div class="n">4 / 5</div><div class="l">Eval cases pass</div></div>
+      <div class="stat ok"><div class="n">6 / 7</div><div class="l">Eval cases pass</div></div>
       <div class="stat warn"><div class="n">1</div><div class="l">Honestly flagged "needs work"</div></div>
       <div class="stat"><div class="n">7</div><div class="l">Escalation triggers enforced</div></div>
       <div class="stat"><div class="n">4×</div><div class="l">Re-runs to confirm a fix held</div></div>
@@ -145,7 +145,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);l
     <div class="cards">
       <div class="card">
         <h3>Evaluation framework</h3>
-        <p>5 cases, each mapped to an expected outcome: happy path, missing data, low confidence, tooling-blind + high severity, and cascading failures needing precedence logic — run for real, not mocked.</p>
+        <p>7 cases, each mapped to an expected outcome: happy path, missing data, low confidence, tooling-blind + high severity, cascading failures needing precedence logic, and two correlation-mismatch cases (wrong DAG's log, stale timestamp) added after review flagged the original set never tested that trigger — run for real, not mocked.</p>
       </div>
       <div class="card">
         <h3>Metrics that matter</h3>
