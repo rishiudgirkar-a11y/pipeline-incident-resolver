@@ -65,6 +65,7 @@ examples/
   sample_review_packet.md           target shape of a decision output
 design/
   TOKENS.css, SKINS.md              locked design tokens for the console UI
+DESIGN_PRD_ANSWERS.md               blueprint phase: agent role, loop, context, tools, escalation rules
 DEVELOP_PRD_ANSWERS.md              build phase: scope, evals, improvement made, limitations
 DEPLOY_PRD_ANSWERS.md               launch phase: go/no-go, risks, pilot plan, monitoring
 ```
