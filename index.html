@@ -521,6 +521,28 @@ const INCIDENTS = [
     "status": "Open",
     "short_description": "Warehouse load nightly EMR step ran out of memory",
     "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0016789",
+    "dag_name": "customer_360_merge",
+    "pipeline": "Customer 360 Merge (EMR)",
+    "failure_timestamp": "2026-08-01T03:10:00Z",
+    "created_at": "2026-08-01T03:12:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Customer 360 merge EMR step failed overnight",
+    "simulated_recovery": "success"
+  },
+  {
+    "incident_number": "INC0017890",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-08-02T02:15:00Z",
+    "created_at": "2026-08-02T02:17:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest EMR step failed overnight (second occurrence)",
+    "simulated_recovery": "success"
   }
 ];
 
@@ -644,6 +666,22 @@ const LOGS = [
     "log_filename": "warehouse_load_nightly_20260731T020000Z.log",
     "fetch_status": "ok",
     "log_text": "26/07/31 01:58:20 INFO ShuffleMapStage: Stage 2 (mapPartitions at WarehouseLoadNightly.scala:53) running\n26/07/31 01:59:55 WARN YarnAllocator: Container killed by YARN for exceeding memory limits. 7.0 GB of 7.0 GB physical memory used.\n26/07/31 01:59:55 ERROR Executor: Exception in task 15.0 in stage 2.0 (TID 88)\njava.lang.OutOfMemoryError: Java heap space\n26/07/31 01:59:57 ERROR TaskSetManager: Task 15 in stage 2.0 failed 4 times; aborting job\n26/07/31 01:59:58 ERROR EMRStep: Step warehouse_load_nightly_step failed with exit code 1\n"
+  },
+  {
+    "incident_number": "INC0016789",
+    "dag_name": "clickstream_dedup",
+    "timestamp": "2026-08-01T03:10:00Z",
+    "log_filename": "clickstream_dedup_20260801T031000Z.log",
+    "fetch_status": "ok",
+    "log_text": "26/08/01 03:08:15 INFO ShuffleMapStage: Stage 4 (mapPartitions at ClickstreamDedup.scala:88) running\n26/08/01 03:09:50 WARN YarnAllocator: Container killed by YARN for exceeding memory limits. 6.0 GB of 6.0 GB physical memory used.\n26/08/01 03:09:50 ERROR Executor: Exception in task 12.0 in stage 4.0 (TID 140)\njava.lang.OutOfMemoryError: GC overhead limit exceeded\n26/08/01 03:09:52 ERROR TaskSetManager: Task 12 in stage 4.0 failed 4 times; aborting job\n26/08/01 03:09:53 ERROR EMRStep: Step clickstream_dedup_step failed with exit code 1\n"
+  },
+  {
+    "incident_number": "INC0017890",
+    "dag_name": "daily_sales_ingest",
+    "timestamp": "2026-07-30T02:14:00Z",
+    "log_filename": "daily_sales_ingest_20260730T021400Z.log",
+    "fetch_status": "ok",
+    "log_text": "26/07/30 02:12:41 INFO YarnClusterScheduler: Registered executor 3 on ip-10-0-4-91.ec2.internal\n26/07/30 02:13:58 INFO ShuffleMapStage: Stage 4 (mapPartitions at DailySalesIngest.scala:88) running\n26/07/30 02:14:02 WARN YarnAllocator: Container killed by YARN for exceeding memory limits. 5.5 GB of 5.5 GB physical memory used.\n26/07/30 02:14:02 ERROR Executor: Exception in task 12.0 in stage 4.0 (TID 233)\njava.lang.OutOfMemoryError: Java heap space\n\tat org.apache.spark.sql.execution.datasources.parquet.ParquetRowConverter.<init>(ParquetRowConverter.java:161)\n\tat org.apache.spark.sql.execution.datasources.parquet.ParquetRecordMaterializer.<init>(ParquetRecordMaterializer.java:41)\n26/07/30 02:14:03 ERROR TaskSetManager: Task 12 in stage 4.0 failed 4 times; aborting job\n26/07/30 02:14:04 ERROR DAGScheduler: Job aborted due to stage failure\n26/07/30 02:14:05 ERROR EMRStep: Step daily_sales_ingest_step failed with exit code 1\n"
   }
 ];
 
@@ -685,6 +723,22 @@ const EVAL_CASES = [
     "name": "Cascading failure - root cause precedence",
     "incident_number": "INC0007890",
     "expected_behavior": "Log contains both an OutOfMemoryError (symptom) and an earlier upstream dependency timeout (root cause). Agent applies error_catalog.json precedence and matches UPSTREAM_TIMEOUT_003 at confidence >= 0.95 rather than stopping at the more obvious EMR_OOM_002 - or escalates if it cannot disambiguate confidently.",
+    "risk": "High",
+    "result": "Not run"
+  },
+  {
+    "case_id": "E-06",
+    "name": "DAG name mismatch",
+    "incident_number": "INC0016789",
+    "expected_behavior": "Incident is on customer_360_merge but the fetched log record is for clickstream_dedup -- a wrong log returned by fetch_emr_log(). Pre-check 1 (DAG name in incident matches DAG name in log) fails before any error-code matching happens. Agent must escalate with reason DAG/time correlation mismatch and never call update_servicenow(), even though the log itself contains a clean, high-confidence OutOfMemoryError signature.",
+    "risk": "High",
+    "result": "Not run"
+  },
+  {
+    "case_id": "E-07",
+    "name": "Failure-time correlation mismatch",
+    "incident_number": "INC0017890",
+    "expected_behavior": "Incident and log share the same DAG (daily_sales_ingest) and the log contains a clean, high-confidence OutOfMemoryError signature, but the log's timestamp (2026-07-30T02:14:00Z) does not correspond to this incident's failure_timestamp (2026-08-02T02:15:00Z) -- a stale log from an earlier run of the same recurring DAG. Pre-check 2 (log corresponds to the incident's failure time) fails. Agent must escalate with reason DAG/time correlation mismatch rather than confidently recommending SOP_EMR_OOM_002 for the wrong run.",
     "risk": "High",
     "result": "Not run"
   }

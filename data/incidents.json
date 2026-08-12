@@ -163,5 +163,27 @@
     "status": "Open",
     "short_description": "Warehouse load nightly EMR step ran out of memory",
     "simulated_recovery": null
+  },
+  {
+    "incident_number": "INC0016789",
+    "dag_name": "customer_360_merge",
+    "pipeline": "Customer 360 Merge (EMR)",
+    "failure_timestamp": "2026-08-01T03:10:00Z",
+    "created_at": "2026-08-01T03:12:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Customer 360 merge EMR step failed overnight",
+    "simulated_recovery": "success"
+  },
+  {
+    "incident_number": "INC0017890",
+    "dag_name": "daily_sales_ingest",
+    "pipeline": "Daily Sales Ingest (EMR)",
+    "failure_timestamp": "2026-08-02T02:15:00Z",
+    "created_at": "2026-08-02T02:17:00Z",
+    "severity": "SEV-3",
+    "status": "Open",
+    "short_description": "Daily sales ingest EMR step failed overnight (second occurrence)",
+    "simulated_recovery": "success"
   }
 ]
